@@ -12,6 +12,10 @@ So what are you waiting for? Upgrade your Discord experience with MessageBookmar
 
 TL;DR: ***global pins but compact***
 
+# Requirements
+
+You need [ZeresPluginLibrary](https://betterdiscord.app/plugin/ZeresPluginLibrary) to use this plugin.
+
 # How To Use
 
 Just right click on the little Discord logo on the top left. You'll find "Add New Bookmark". After clicking on it, a small menu will pop up where you can provide the title of your bookmark and the message link you want to save.
