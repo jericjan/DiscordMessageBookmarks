@@ -7,7 +7,7 @@
 
 class Menu {
   constructor(id, parentElem) {
-//banana
+    //banana
 
     function appendOrGetExisting(parent, idSelector) {
       if (parent.querySelectorAll("#" + idSelector).length == 0) { //none found
@@ -33,7 +33,7 @@ class Menu {
     this.contextMenu = contextMenu
   }
 
-  addItem(name, url, loadOnly = false) {
+  addItem(name, url, loadOnly = false, placeBeforeNth) {
     let itemDiv = document.createElement("div")
     itemDiv.setAttribute("class", "Kur0-item")
     itemDiv.innerHTML = name
@@ -51,6 +51,7 @@ class Menu {
       itemDiv.onclick = (event) => {
         url()
         event.stopPropagation();
+        this.contextMenu.classList.remove("visible")
       }
     } else if (url == "add") {
       this.contextMenu.appendChild(itemDiv)
@@ -61,38 +62,8 @@ class Menu {
 
 
       itemDiv.onclick = () => {
-        var parent = this.contextMenu
-        if (parent.querySelectorAll("#Kur0-bookmarkDiv").length != 0) {
-          parent.querySelectorAll("#Kur0-bookmarkDiv").forEach((a) => {
-            a.remove()
-          })
-        }
+        this.openBookmarkTool()
 
-        var bookmarkDiv = document.createElement("div")
-        bookmarkDiv.id = "Kur0-bookmarkDiv"
-        parent.appendChild(bookmarkDiv)
-
-        var nameInput = document.createElement("input")
-        nameInput.placeholder = "Title here"
-        bookmarkDiv.appendChild(nameInput)
-
-        var urlInput = document.createElement("input")
-        urlInput.placeholder = "Paste message URL here"
-        bookmarkDiv.appendChild(urlInput)
-
-        var button = document.createElement("button")
-        button.innerHTML = "Save"
-        bookmarkDiv.appendChild(button)
-
-        button.onclick = function () {
-          let name = nameInput.value
-          let url = urlInput.value
-          if (name != "" && url != "") {
-            nameInput.value = ''
-            urlInput.value = ''
-            this.addItem(name, url)
-          }
-        }.bind(this)
 
 
       }
@@ -103,7 +74,11 @@ class Menu {
       console.log("adding item")
       var correctURL = checkURL(url)
       if (correctURL) {
-        this.contextMenu.insertBefore(itemDiv, document.querySelector("#addButton"))
+        if (placeBeforeNth == undefined) {
+          this.contextMenu.insertBefore(itemDiv, document.querySelector("#addButton"))
+        } else {
+          this.contextMenu.insertBefore(itemDiv, this.contextMenu.querySelector(`:nth-child(${placeBeforeNth + 1})`))
+        }
         itemDiv.onclick = () => {
           ZLibrary.DiscordModules.NavigationUtils.transitionTo(correctURL)
         }
@@ -118,7 +93,7 @@ class Menu {
           itemMenu.removeAllItems()
           itemMenu.addItem("Edit", () => {
             console.log(`edit on ${nthNum}`)
-
+            this.openBookmarkTool("edit", nthNum, name, correctURL)
           })
           itemMenu.addItem("Delete", () => {
             console.log(`delete on ${nthNum}`)
@@ -142,7 +117,7 @@ class Menu {
     }
 
   }
-///
+  ///
   open(event) {
     this.contextMenu.classList.add("visible")
     this.contextMenu.style.left = event.screenX.toString() + "px"
@@ -158,6 +133,64 @@ class Menu {
     var data = BdApi.Data.load("MessageBookmarks", "urls")
     data.splice(nth, 1);
     BdApi.Data.save("MessageBookmarks", "urls", data)
+  }
+
+  editItem(nthNum, name, url) {
+    //delete the item, put thing before it    
+    this.addItem(name, url, true, nthNum)
+    this.contextMenu.querySelector(`:nth-child(${nthNum + 2})`).remove() //2 because we added an item right before this
+
+    //replace item in json
+    var data = BdApi.Data.load("MessageBookmarks", "urls")
+    data[nthNum] = [name, url]
+    BdApi.Data.save("MessageBookmarks", "urls", data)
+
+  }
+
+  openBookmarkTool(mode = "add", nthNum, name, url) {
+    console.log("bookmark tool opened")
+
+    var parent = this.contextMenu
+    if (parent.querySelectorAll("#Kur0-bookmarkDiv").length != 0) {
+      parent.querySelectorAll("#Kur0-bookmarkDiv").forEach((a) => {
+        a.remove()
+      })
+    }
+    var bookmarkDiv = document.createElement("div")
+    bookmarkDiv.id = "Kur0-bookmarkDiv"
+    parent.appendChild(bookmarkDiv)
+
+    var nameInput = document.createElement("input")
+    nameInput.value = name ? name : ""
+    nameInput.placeholder = "Title here"
+    bookmarkDiv.appendChild(nameInput)
+
+    var urlInput = document.createElement("input")
+    urlInput.value = url ? url : ""
+    urlInput.placeholder = "Paste message URL here"
+    bookmarkDiv.appendChild(urlInput)
+
+    var button = document.createElement("button")
+    button.innerHTML = mode == "add" ? "Save" : "EDIT"
+    bookmarkDiv.appendChild(button)
+
+    button.onclick = function () {
+      let name = nameInput.value
+      let url = urlInput.value
+      if (name != "" && url != "") {
+        nameInput.value = ''
+        urlInput.value = ''
+        if (mode == "add") {
+          this.addItem(name, url)
+        } else if (mode == "edit") {
+          console.log("le editing")
+          console.log(nthNum, name, url)
+          this.editItem(nthNum, name, url)
+        }
+
+      }
+    }.bind(this)
+
   }
 
 }
