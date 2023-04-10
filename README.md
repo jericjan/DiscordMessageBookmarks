@@ -10,6 +10,8 @@ Whether you need to save a message with important information, a hilarious meme,
 
 So what are you waiting for? Upgrade your Discord experience with MessageBookmarks and start saving those important messages today!
 
+TL;DR: ***global pins but compact***
+
 # How To Use
 
 Just right click on the little Discord logo on the top left. You'll find "Add New Bookmark". After clicking on it, a small menu will pop up where you can provide the title of your bookmark and the message link you want to save.
