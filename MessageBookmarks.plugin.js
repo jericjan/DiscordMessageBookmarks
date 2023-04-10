@@ -6,9 +6,20 @@
  */
 
 class Menu {
-  constructor(id, parentElem) {
-    //banana
 
+  /**
+   * creates a Menu object with an `id` and optionally append it under `parentElem`
+   * @param {string} id 
+   * @param {*} [parentElem]
+   */
+  constructor(id, parentElem) {    
+
+    /**
+     * Append a `div` with the id `idSelector` under a `parent` element, or grab that div if it already exists.
+     * @param {HTMLElement} parent 
+     * @param {string} idSelector 
+     * @returns {HTMLDivElement}
+     */
     function appendOrGetExisting(parent, idSelector) {
       if (parent.querySelectorAll("#" + idSelector).length == 0) { //none found
         console.log(`${idSelector} menu doesn't exist under the following element. creating`)
@@ -33,6 +44,13 @@ class Menu {
     this.contextMenu = contextMenu
   }
 
+  /**
+   * adds an item to the menu
+   * @param {string} name - the name of the item
+   * @param {string} url  - the message link it points to 
+   * @param {boolean} [loadOnly=false] - if true, will only load the item to the menu and not save to the JSON file
+   * @param {number} [placeBeforeNth]  - place item before nth (starts at 0)
+   */
   addItem(name, url, loadOnly = false, placeBeforeNth) {
     let itemDiv = document.createElement("div")
     itemDiv.setAttribute("class", "Kur0-item")
@@ -117,7 +135,11 @@ class Menu {
     }
 
   }
-  ///
+  
+  /**
+   * opens the menu
+   * @param {MouseEvent} event 
+   */
   open(event) {
     this.contextMenu.classList.add("visible")
     this.contextMenu.style.left = event.screenX.toString() + "px"
@@ -128,6 +150,10 @@ class Menu {
     this.contextMenu.innerHTML = ''
   }
 
+  /**
+   * removes a menu item at `nth` index (starting at 0)
+   * @param {number} nth 
+   */
   removeItem(nth) {
     this.contextMenu.querySelector(`:nth-child(${nth + 1})`).remove()
     var data = BdApi.Data.load("MessageBookmarks", "urls")
@@ -135,6 +161,12 @@ class Menu {
     BdApi.Data.save("MessageBookmarks", "urls", data)
   }
 
+  /**
+   * edits a menu item at `nth` (starting at 0)
+   * @param {number} nthNum 
+   * @param {string} name 
+   * @param {string} url 
+   */
   editItem(nthNum, name, url) {
     //delete the item, put thing before it    
     this.addItem(name, url, true, nthNum)
@@ -147,6 +179,13 @@ class Menu {
 
   }
 
+  /**
+   * opens the bookmark tool, used to adding/editing bookmarks
+   * @param {('add'|'edit')} mode - the mode to use.
+   * @param {number} nthNum - the nth item to edit (starting at 0)
+   * @param {string} name - if editing, the bookmark's original name
+   * @param {string} url - if editing, the bookmark's original url
+   */
   openBookmarkTool(mode = "add", nthNum, name, url) {
     console.log("bookmark tool opened")
 
